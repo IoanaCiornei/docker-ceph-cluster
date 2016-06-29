@@ -62,8 +62,8 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	scp node$i:.ssh/id_rsa.pub ./tmp-node$i
 
 	# give user 'ioana' sudo without password
-	CONFIG="ioana ALL=(ALL:ALL) ALL"
-	ssh -t root@node$i "bash -c 'echo "$CONFIG" | (EDITOR="tee -a" visudo)'"
+	CONFIG="ioana ALL=(ALL) NOPASSWD: ALL"
+	ssh -t root@node$i "echo \"$CONFIG\" >> /etc/sudoers"
 done
 
 # partition the disks on the OSDs
@@ -85,8 +85,6 @@ cat ./tmp-all
 for (( i = 0; i < $NUM_NODES; i++)); do
 	scp ~/.ssh/authorized_keys node$i:$AUTHORIZED_KEYS
 done
-
-
 
 # cleanup
 rm ./tmp*
