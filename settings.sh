@@ -1,16 +1,22 @@
 #! /bin/bash
 
-NUM_NODES=7
-ADMIN=0
 NUM_OSD=3
 NUM_MON=3
+((NUM_NODES = $NUM_MON + $NUM_OSD + 1))
+
 NUM_DISKS=4
 FILES_DIR=../dev-files
+
+LOOP_MAJOR=7
 START_MINOR=100
 
 NETWORK_IP="172.18.0"
 NETWORK_MASK=16
 CLUSTER_NETWORK="ceph_network"
+
+USER="ioana"
 PASSWORD="ceph"
+ROOT_PASSWORD="root"
+
 AUTHORIZED_KEYS="~/.ssh/authorized_keys"
 

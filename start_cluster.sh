@@ -4,6 +4,17 @@ source ./settings.sh
 
 set -x
 
+# create the array of hostnames
+for (( i = 0; i < $NUM_NODES; i++)); do
+	if (( i == 0 )); then
+		node_name[$i]="admin"
+	elif (( i <= $NUM_OSD )); then
+		node_name[$i]="osd$i"
+	else
+		node_name[$i]="mon"$(($i - $NUM_OSD))
+	fi
+done
+
 # create the cluster network
 sudo docker network create --subnet=$NETWORK_IP.0/$NETWORK_MASK $CLUSTER_NETWORK
 

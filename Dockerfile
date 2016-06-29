@@ -10,6 +10,11 @@ RUN apt-get install -y vim git
 RUN apt-get install -y ntp ntpdate ntp-doc
 RUN apt-get install -y parted xfsprogs
 
+# Add Ceph repositories to the ceph-deploy admin node. Then, install ceph-deploy
+RUN wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
+RUN echo deb http://download.ceph.com/debian-jewel/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
+RUN apt-get update && apt-get install -y ceph-deploy
+
 ###### Create USER ######
 RUN useradd --create-home --shell /bin/bash --groups sudo ioana
 RUN echo 'ioana:ceph' | chpasswd
