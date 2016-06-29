@@ -8,7 +8,7 @@ NUM_DISKS=4
 FILES_DIR=../dev-files
 
 LOOP_MAJOR=7
-START_MINOR=100
+START_MINOR=200
 
 NETWORK_IP="172.18.0"
 NETWORK_MASK=16
@@ -18,5 +18,17 @@ USER="ioana"
 PASSWORD="ceph"
 ROOT_PASSWORD="root"
 
-AUTHORIZED_KEYS="~/.ssh/authorized_keys"
+AUTHORIZED_KEYS="/home/ioana/.ssh/authorized_keys"
+
+# create the array of hostnames
+for (( i = 0; i < $NUM_NODES; i++)); do
+	if (( i == 0 )); then
+		node_name[$i]="admin"
+	elif (( i <= $NUM_OSD )); then
+		node_name[$i]="osd$i"
+	else
+		node_name[$i]="mon"$(($i - $NUM_OSD))
+	fi
+done
+
 
