@@ -55,10 +55,12 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	sshpass -p $PASSWORD ssh-copy-id $USER@${node_name[$i]}
 	sshpass -p $ROOT_PASSWORD ssh-copy-id root@${node_name[$i]}
 
-	ssh ${node_name[$i]} "ssh-keygen -f ~/.ssh/id_rsa -N ''"
+	ssh $USER@${node_name[$i]} "echo "StrictHostKeyChecking no" >> /home/$USER/.ssh/config"
+
+	ssh $USER@${node_name[$i]} "ssh-keygen -f ~/.ssh/id_rsa -N ''"
 
 	# create a temp file with the id_rsa.pub of the node
-	scp ${node_name[$i]}:.ssh/id_rsa.pub ./tmp-node$i
+	scp $USER@${node_name[$i]}:.ssh/id_rsa.pub ./tmp-node$i
 
 	# give user sudo without password
 	CONFIG="$USER ALL=(ALL) NOPASSWD: ALL"
