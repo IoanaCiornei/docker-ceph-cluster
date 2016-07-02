@@ -10,6 +10,8 @@ sudo docker network create --subnet=$NETWORK_IP.0/$NETWORK_MASK $CLUSTER_NETWORK
 # build the latest image of the ceph_node
 sudo docker build -t ceph_node .
 
+read
+
 # create the files that will represent the extra disks for the containers
 mkdir $FILES_DIR
 minor=$START_MINOR
@@ -42,10 +44,14 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 			-v "$FILE"1:"$FILE"1 \
 			-v "$FILE"2:"$FILE"2 \
 			-v "$FILE"3:"$FILE"3 \
+			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
 	else
 		# admin or mon container
-		sudo docker run -d -it --net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
+		sudo docker run -d -it \
+			--privileged \
+			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
+			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
 	fi
 
 	# add the new node into /etc/hosts

@@ -1,19 +1,31 @@
-FROM ubuntu:14.04
+FROM debian:jessie
 MAINTAINER Ioana Ciornei <ciorneiioana@gmail.com>
 
-RUN apt-get update
+ENV container docker
+
+# https://github.com/phusion/baseimage-docker/issues/58
+RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+
+RUN apt-get -y update
+RUN apt-get -y upgrade
+RUN apt-get install -y systemd systemd-sysv
 RUN apt-get install -y openssh-server
 RUN apt-get install -y x11-apps
 RUN apt-get install -y vim tmux
-RUN apt-get install -y vim curl
-RUN apt-get install -y vim git
+RUN apt-get install -y curl
+RUN apt-get install -y git
 RUN apt-get install -y ntp ntpdate ntp-doc
-RUN apt-get install -y parted xfsprogs
+RUN apt-get install -y parted xfsprogs wget
+RUN apt-get install -y lsb-release
+RUN apt-get install -y sudo
+RUN apt-get install -y libpam-systemd dbus
 
 # Add Ceph repositories to the ceph-deploy admin node. Then, install ceph-deploy
-RUN wget -q -O- 'https://download.ceph.com/keys/release.asc' | sudo apt-key add -
-RUN echo deb http://download.ceph.com/debian-jewel/ $(lsb_release -sc) main | sudo tee /etc/apt/sources.list.d/ceph.list
-RUN apt-get update && apt-get install -y ceph-deploy
+RUN wget -q -O- 'https://download.ceph.com/keys/release.asc' | apt-key add -
+RUN echo deb http://download.ceph.com/debian-jewel/ $(lsb_release -sc) main | tee /etc/apt/sources.list.d/ceph.list
+RUN apt-get -y update
+RUN apt-get install -y ceph-deploy
+
 
 ###### Create USER ######
 RUN useradd --create-home --shell /bin/bash --groups sudo ioana
@@ -48,6 +60,23 @@ RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubuserconte
 RUN echo -e "\n" | vim -c "PlugInstall"; echo ":q"
 
 
-###### RUN SSH server as a root ######
+###### ssh + systemd  ######
 USER root
-CMD ["/usr/sbin/sshd", "-D"]
+
+#RUN rm -f /lib/systemd/system/multi-user.target.wants/*;
+#RUN rm -f /etc/systemd/system/*.wants/*;
+#RUN rm -f /lib/systemd/system/local-fs.target.wants/*;
+#RUN rm -f /lib/systemd/system/sockets.target.wants/*udev*;
+#RUN rm -f /lib/systemd/system/sockets.target.wants/*initctl*;
+#RUN rm -f /lib/systemd/system/basic.target.wants/*;
+#RUN rm -f /lib/systemd/system/anaconda.target.wants/*
+
+
+#RUN ["find / -name 'ssh*.service'"]
+RUN ["systemctl",  "enable", "ssh.service"]
+
+VOLUME ["/sys/fs/cgroup"]
+CMD [ "/sbin/init"]
+
+
+

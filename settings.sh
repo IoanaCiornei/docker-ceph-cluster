@@ -21,14 +21,20 @@ ROOT_PASSWORD="root"
 AUTHORIZED_KEYS="/home/ioana/.ssh/authorized_keys"
 
 # create the array of hostnames
+osds=""
+mons=""
+nodes=""
 for (( i = 0; i < $NUM_NODES; i++)); do
 	if (( i == 0 )); then
-		node_name[$i]="admin"
+		node="admin"
 	elif (( i <= $NUM_OSD )); then
-		node_name[$i]="osd$i"
+		node="osd$i"
+		osds="$osds $node"
 	else
-		node_name[$i]="mon"$(($i - $NUM_OSD))
+		node="mon"$(($i - $NUM_OSD))
+		mons="$mons $node"
 	fi
+	node_name[$i]=$node
+	nodes="$nodes $node"
 done
-
 
