@@ -57,22 +57,41 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	# add the new node into /etc/hosts
 	echo -e "$NODE_IP\t${node_name[$i]}" | sudo tee -a /etc/hosts
 
+	# Wait for container to go up before issuing any more commands
+	while ! ( sshpass -p $PASSWORD ssh $NODE_IP echo -e 'Host $HOSTNAME is up!' ); do :; done
+
 	# copy ssh keys to the node
 	sshpass -p $PASSWORD ssh-copy-id $USER@${node_name[$i]}
 	sshpass -p $ROOT_PASSWORD ssh-copy-id root@${node_name[$i]}
 
 	ssh $USER@${node_name[$i]} "echo "StrictHostKeyChecking no" >> /home/$USER/.ssh/config"
 
-	ssh $USER@${node_name[$i]} "ssh-keygen -f ~/.ssh/id_rsa -N ''"
+	#ssh $USER@${node_name[$i]} "ssh-keygen -f ~/.ssh/id_rsa -N ''"
+	scp ~/.ssh/id_rsa ~/.ssh/id_rsa.pub ${node_name[i]}:~/.ssh/
+	scp ~/.ssh/authorized_keys ${node_name[$i]}:~/.ssh/
 
 	# create a temp file with the id_rsa.pub of the node
-	scp $USER@${node_name[$i]}:.ssh/id_rsa.pub ./tmp-node$i
+	#scp $USER@${node_name[$i]}:.ssh/id_rsa.pub ./tmp-node$i
 
 	# give user sudo without password
 	CONFIG="$USER ALL=(ALL) NOPASSWD: ALL"
 	ssh -t root@${node_name[$i]} "echo \"$CONFIG\" >> /etc/sudoers"
 
 done
+
+# concatenate the keys from all the nodes in order to create .ssh/authorized_keys
+#cat ./tmp-node* > ./tmp-all
+#cat ~/.ssh/id_rsa.pub >> ./tmp-all
+#sudo cp ./tmp-all ~/.ssh/authorized_keys
+#cat ./tmp-all
+
+# copy the authorized key file to all the nodes
+#for (( i = 0; i < $NUM_NODES; i++)); do
+	#scp ~/.ssh/authorized_keys ${node_name[$i]}:~/.ssh/
+#done
+
+# cleanup
+#rm ./tmp*
 
 # partition the disks on the OSDs
 for (( i = 1; i <= $NUM_OSD; i++)); do
@@ -81,22 +100,9 @@ for (( i = 1; i <= $NUM_OSD; i++)); do
 		ssh -t root@${node_name[$i]} "parted -s /dev/$FILE$j mklabel gpt mkpart primary xfs 0% 100%"
 		ssh -t root@${node_name[$i]} "mkfs.xfs /dev/$FILE$j -f"
 	done
-	ssh -t root@${node_name[$i]} "parted -s /dev/$FILE3 mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%"
+	echo $FILE
+	ssh -t root@${node_name[$i]} "parted -s /dev/'$FILE'3 mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%"
 done
-
-# concatenate the keys from all the nodes in order to create .ssh/authorized_keys
-cat ./tmp-node* > ./tmp-all
-cat ~/.ssh/id_rsa.pub >> ./tmp-all
-sudo cp ./tmp-all ~/.ssh/authorized_keys
-cat ./tmp-all
-
-# copy the authorized key file to all the nodes
-for (( i = 0; i < $NUM_NODES; i++)); do
-	scp $AUTHORIZED_KEYS ${node_name[$i]}:$AUTHORIZED_KEYS
-done
-
-# cleanup
-rm ./tmp*
 
 echo "Running nodes in cluster:"
 sudo docker ps

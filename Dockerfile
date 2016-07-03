@@ -62,19 +62,7 @@ RUN echo -e "\n" | vim -c "PlugInstall"; echo ":q"
 
 ###### ssh + systemd  ######
 USER root
-
-#RUN rm -f /lib/systemd/system/multi-user.target.wants/*;
-#RUN rm -f /etc/systemd/system/*.wants/*;
-#RUN rm -f /lib/systemd/system/local-fs.target.wants/*;
-#RUN rm -f /lib/systemd/system/sockets.target.wants/*udev*;
-#RUN rm -f /lib/systemd/system/sockets.target.wants/*initctl*;
-#RUN rm -f /lib/systemd/system/basic.target.wants/*;
-#RUN rm -f /lib/systemd/system/anaconda.target.wants/*
-
-
-#RUN ["find / -name 'ssh*.service'"]
 RUN ["systemctl",  "enable", "ssh.service"]
-
 VOLUME ["/sys/fs/cgroup"]
 CMD [ "/sbin/init"]
 
