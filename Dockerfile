@@ -60,8 +60,9 @@ RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubuserconte
 RUN echo -e "\n" | vim -c "PlugInstall"; echo ":q"
 
 
-###### ssh + systemd  ######
 USER root
+
+###### ssh + systemd  ######
 RUN ["systemctl",  "enable", "ssh.service"]
 VOLUME ["/sys/fs/cgroup"]
 CMD [ "/sbin/init"]
