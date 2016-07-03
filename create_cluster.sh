@@ -10,23 +10,26 @@ sudo docker network create --subnet=$NETWORK_IP.0/$NETWORK_MASK $CLUSTER_NETWORK
 # build the latest image of the ceph_node
 sudo docker build -t ceph_node .
 
+# array of devices - devs
+
 # create the files that will represent the extra disks for the containers
 mkdir $FILES_DIR
-minor=$START_MINOR
+num=0
 for (( i = 1; i <= $NUM_OSD; i++)); do
 
 	for (( j = 0; j < $NUM_DISKS; j++)); do
 		FILE="osd$i-disk$j"
 		HOST_FILE="$FILES_DIR/$FILE"
-		BLK_FILE="/dev/$FILE"
 
 		[ -f $HOST_FILE ]  || fallocate -l 1G $HOST_FILE
-		sudo mknod $BLK_FILE b $LOOP_MAJOR $minor
-		sudo losetup $BLK_FILE $HOST_FILE
-
-		(( minor = $minor + 1 ))
+		sudo losetup --find $HOST_FILE
+		disk=$(losetup --associated $HOST_FILE | cut -f1 -d:)
+		devs[$num]=$disk
+		((num = $num + 1))
 	done
 done
+
+read
 
 # create NUM_NODES containers
 for (( i = 0; i < $NUM_NODES; i++)); do
@@ -38,12 +41,10 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 		# start the container with multiple disk if it is a OSD
 		sudo docker run -d -it \
 			--privileged \
-			-v "$FILE"0:"$FILE"0 \
-			-v "$FILE"1:"$FILE"1 \
-			-v "$FILE"2:"$FILE"2 \
-			-v "$FILE"3:"$FILE"3 \
+			-v /dev/:/dev \
 			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
+
 	else
 		# admin or mon container
 		sudo docker run -d -it \
@@ -77,14 +78,15 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 done
 
 # partition the disks on the OSDs
+num=0
 for (( i = 1; i <= $NUM_OSD; i++)); do
-	FILE="osd$i-disk"
 	for (( j = 0; j < 3 ; j++)); do
-		ssh -t root@${node_name[$i]} "parted -s /dev/$FILE$j mklabel gpt mkpart primary xfs 0% 100%"
-		ssh -t root@${node_name[$i]} "mkfs.xfs /dev/$FILE$j -f"
+		FILE=${devs[$num]}
+		#ssh -t root@${node_name[$i]} "parted -s /dev/$FILE mklabel gpt mkpart primary xfs 0% 100%"
+		#ssh -t root@${node_name[$i]} "mkfs.xfs /dev/$FILE -f"
+		((num = $num + 1))
 	done
-	echo $FILE
-	ssh -t root@${node_name[$i]} "parted -s /dev/'$FILE'3 mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%"
+	#ssh -t root@${node_name[$i]} "parted -s /dev/$FILE mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%"
 done
 
 echo "Running nodes in cluster:"
