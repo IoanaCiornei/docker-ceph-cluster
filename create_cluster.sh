@@ -10,8 +10,6 @@ sudo docker network create --subnet=$NETWORK_IP.0/$NETWORK_MASK $CLUSTER_NETWORK
 # build the latest image of the ceph_node
 sudo docker build -t ceph_node .
 
-read
-
 # create the files that will represent the extra disks for the containers
 mkdir $FILES_DIR
 minor=$START_MINOR
@@ -58,40 +56,25 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	echo -e "$NODE_IP\t${node_name[$i]}" | sudo tee -a /etc/hosts
 
 	# Wait for container to go up before issuing any more commands
-	while ! ( sshpass -p $PASSWORD ssh $NODE_IP echo -e 'Host $HOSTNAME is up!' ); do :; done
+	while ! (yes | sshpass -p $PASSWORD ssh $USER@${node_name[$i]} echo -e 'Host $HOSTNAME is up!'); do :; done
 
-	# copy ssh keys to the node
-	sshpass -p $PASSWORD ssh-copy-id $USER@${node_name[$i]}
-	sshpass -p $ROOT_PASSWORD ssh-copy-id root@${node_name[$i]}
+	# TODO
+	# 1. generate keys on host of there aren't
+	# 2. copy them to the containers with docker
+	# 3. add UserKnownHostsFile /dev/null  + StrictHostKeyChecking no
 
-	ssh $USER@${node_name[$i]} "echo "StrictHostKeyChecking no" >> /home/$USER/.ssh/config"
-
-	#ssh $USER@${node_name[$i]} "ssh-keygen -f ~/.ssh/id_rsa -N ''"
-	scp ~/.ssh/id_rsa ~/.ssh/id_rsa.pub ${node_name[i]}:~/.ssh/
-	scp ~/.ssh/authorized_keys ${node_name[$i]}:~/.ssh/
-
-	# create a temp file with the id_rsa.pub of the node
-	#scp $USER@${node_name[$i]}:.ssh/id_rsa.pub ./tmp-node$i
+	# copy my keys to the other hosts
+	sshpass -p $PASSWORD scp -v ~/.ssh/id_rsa ~/.ssh/id_rsa.pub ${node_name[i]}:~/.ssh/
+	sshpass -p $PASSWORD scp -v ~/.ssh/authorized_keys ${node_name[$i]}:~/.ssh/authorized_keys
+	sshpass -p $ROOT_PASSWORD scp -v ~/.ssh/authorized_keys root@${node_name[$i]}:~/.ssh/authorized_keys
 
 	# give user sudo without password
 	CONFIG="$USER ALL=(ALL) NOPASSWD: ALL"
 	ssh -t root@${node_name[$i]} "echo \"$CONFIG\" >> /etc/sudoers"
 
+	ssh $USER@${node_name[$i]} "echo -e 'Host *\n\tStrictHostKeyChecking no' >> ~/.ssh/config"
+
 done
-
-# concatenate the keys from all the nodes in order to create .ssh/authorized_keys
-#cat ./tmp-node* > ./tmp-all
-#cat ~/.ssh/id_rsa.pub >> ./tmp-all
-#sudo cp ./tmp-all ~/.ssh/authorized_keys
-#cat ./tmp-all
-
-# copy the authorized key file to all the nodes
-#for (( i = 0; i < $NUM_NODES; i++)); do
-	#scp ~/.ssh/authorized_keys ${node_name[$i]}:~/.ssh/
-#done
-
-# cleanup
-#rm ./tmp*
 
 # partition the disks on the OSDs
 for (( i = 1; i <= $NUM_OSD; i++)); do

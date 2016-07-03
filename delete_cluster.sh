@@ -17,3 +17,5 @@ done
 sudo docker network rm $CLUSTER_NETWORK
 
 sudo losetup -D
+
+# TODO reverse mknod
