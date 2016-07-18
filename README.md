@@ -5,6 +5,11 @@ This repo is intended to help users create, setup and run a Ceph cluster
 using Docker containers on the same machine.
 
 
+### Dependencies
+
+* docker.io + docker
+* sshpass
+
 ### Install Docker
 
 In order to use it you should have docker installed. In order to do that

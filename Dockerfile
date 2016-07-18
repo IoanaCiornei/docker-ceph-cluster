@@ -28,12 +28,13 @@ RUN apt-get install -y ceph-deploy
 
 
 ###### Create USER ######
-RUN useradd --create-home --shell /bin/bash --groups sudo ioana
-RUN echo 'ioana:ceph' | chpasswd
-RUN mkdir /home/ioana/.ssh/
-RUN chown ioana:ioana -R /home/ioana/
+RUN useradd --create-home --shell /bin/bash --groups sudo pis
+RUN echo 'pis:ceph' | chpasswd
+RUN mkdir /home/pis/.ssh/
+RUN chown pis:pis -R /home/pis/
 
 ###### SSH #######
+RUN mkdir /root/.ssh
 RUN mkdir /var/run/sshd
 RUN echo 'root:root' | chpasswd
 RUN sed -i 's/PermitRootLogin without-password/PermitRootLogin yes/' /etc/ssh/sshd_config
@@ -44,17 +45,15 @@ RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so
 ENV NOTVISIBLE "in users profile"
 RUN echo "export VISIBLE=now" >> /etc/profile
 
-RUN ssh-keygen -f ~/.ssh/id_rsa.pub -t rsa -N ''
-
 EXPOSE 22
 
 ###### VIM + TMUX ######
 
-USER ioana
+USER pis
 
-RUN mkdir /home/ioana/src
-RUN cd /home/ioana/src ; git clone https://github.com/vladimiroltean/blog.git
-RUN cd /home/ioana/src/blog ; ./install.sh ; whoami
+RUN mkdir /home/pis/src
+RUN cd /home/pis/src ; git clone https://github.com/vladimiroltean/blog.git
+RUN cd /home/pis/src/blog ; ./install.sh ; whoami
 
 RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 RUN echo -e "\n" | vim -c "PlugInstall"; echo ":q"

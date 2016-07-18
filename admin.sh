@@ -22,9 +22,9 @@ ceph-deploy disk zap osd3:loop10 osd3:loop11 osd3:loop12
 ceph-deploy osd create osd3:loop10:/dev/loop13p1 osd3:loop11:/dev/loop13p2 osd3:loop12:/dev/loop13p3
 
 
-sudo gdisk -t 1:45b0969e-9b03-4f30-b4c6-b4b80ceff106 /dev/loop5
-sudo gdisk -t 2:45b0969e-9b03-4f30-b4c6-b4b80ceff106 /dev/loop5
-sudo gdisk -t 3:45b0969e-9b03-4f30-b4c6-b4b80ceff106 /dev/loop5
+sudo sgdisk -t 1:45b0969e-9b03-4f30-b4c6-b4b80ceff106 /dev/loop5
+sudo sgdisk -t 2:45b0969e-9b03-4f30-b4c6-b4b80ceff106 /dev/loop5
+sudo sgdisk -t 3:45b0969e-9b03-4f30-b4c6-b4b80ceff106 /dev/loop5
 
 sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon.target && sudo systemctl status ceph-mon.target
 

@@ -14,7 +14,7 @@ NETWORK_IP="172.18.0"
 NETWORK_MASK=16
 CLUSTER_NETWORK="ceph_network"
 
-USER="ioana"
+USER="pis"
 PASSWORD="ceph"
 ROOT_PASSWORD="root"
 

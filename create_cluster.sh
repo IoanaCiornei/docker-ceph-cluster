@@ -4,6 +4,7 @@ source ./settings.sh
 
 set -x
 
+ssh-copy-id localhost
 
 # create the cluster network
 sudo docker network create --subnet=$NETWORK_IP.0/$NETWORK_MASK $CLUSTER_NETWORK
@@ -85,7 +86,7 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	echo -e "$NODE_IP\t${node_name[$i]}" | sudo tee -a /etc/hosts
 
 	# Wait for container to go up before issuing any more commands
-	while ! (yes | sshpass -p $PASSWORD ssh $USER@${node_name[$i]} echo -e 'Host $HOSTNAME is up!'); do :; done
+	while ! (sshpass -p $PASSWORD ssh $USER@${node_name[$i]} echo -e 'Host $HOSTNAME is up!'); do :; done
 
 	# TODO
 	# 1. generate keys on host of there aren't
@@ -93,8 +94,9 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	# 3. add UserKnownHostsFile /dev/null  + StrictHostKeyChecking no
 
 	# copy my keys to the other hosts
-	sshpass -p $PASSWORD scp -v ~/.ssh/id_rsa ~/.ssh/id_rsa.pub ${node_name[i]}:~/.ssh/
-	sshpass -p $PASSWORD scp -v ~/.ssh/authorized_keys ${node_name[$i]}:~/.ssh/authorized_keys
+	sshpass -p $PASSWORD scp -v ~/.ssh/id_rsa ~/.ssh/id_rsa.pub $USER@${node_name[i]}:~/.ssh/
+	sshpass -p $ROOT_PASSWORD scp -v ~/.ssh/id_rsa ~/.ssh/id_rsa.pub root@${node_name[i]}:~/.ssh/
+	sshpass -p $PASSWORD scp -v ~/.ssh/authorized_keys $USER@${node_name[$i]}:~/.ssh/authorized_keys
 	sshpass -p $ROOT_PASSWORD scp -v ~/.ssh/authorized_keys root@${node_name[$i]}:~/.ssh/authorized_keys
 
 	# give user sudo without password
