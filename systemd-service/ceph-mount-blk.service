@@ -1,0 +1,10 @@
+[Unit]
+Description=Create and mount loop devices to be used as ceph storage
+
+[Service]
+ExecStart=/usr/local/bin/ceph-mount-blk
+Type=forking
+
+[Install]
+WantedBy=default.target
+

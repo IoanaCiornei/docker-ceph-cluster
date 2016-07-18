@@ -1,0 +1,6 @@
+#! /bin/bash
+
+SERVICE_NAME=CEPH_MOUNT_BLOCK
+
+echo "Started service" | systemd-cat -t $SERVICE_NAME
+
