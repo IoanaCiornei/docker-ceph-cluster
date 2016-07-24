@@ -16,6 +16,5 @@ done
 # delete the cluster network
 sudo docker network rm $CLUSTER_NETWORK
 
-sudo losetup -D
-
-# TODO reverse mknod
+# TEMPORARY TODO stop the host ceph service
+sudo systemctl stop ceph-mount-blk.service

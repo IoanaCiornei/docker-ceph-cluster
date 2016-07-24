@@ -12,6 +12,9 @@ sudo docker network create --subnet=$NETWORK_IP.0/$NETWORK_MASK $CLUSTER_NETWORK
 # build the latest image of the ceph_node
 sudo docker build -t ceph_node .
 
+# temporary TODO
+sudo systemctl start ceph-mount-blk.service
+
 # array of loop devices
 loop_devs=$(journalctl -b | grep "$LOGGER" | tail -n $NUM_DEVS | awk '{print $NF}')
 num=0
