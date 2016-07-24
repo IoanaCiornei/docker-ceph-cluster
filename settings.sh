@@ -5,6 +5,7 @@ NUM_MON=3
 ((NUM_NODES = $NUM_MON + $NUM_OSD + 1))
 
 NUM_DISKS=4
+NUM_DEVS=$(($NUM_DISKS * $NUM_OSD))
 CURRENT_FOLDER=$(pwd)
 FILES_DIR=$(realpath ..)"/dev-files"
 
@@ -39,3 +40,4 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	nodes="$nodes $node"
 done
 
+LOGGER="Ceph Docker Disk mounted on"
