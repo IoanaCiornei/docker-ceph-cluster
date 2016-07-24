@@ -1,6 +1,28 @@
 #! /bin/bash
 
-SERVICE_NAME=CEPH_MOUNT_BLOCK
+SERVICE_NAME=ceph-mount-service
+FILES_DIR=/home/pis/src/licenta/dev-files
+NUM_DISKS=4
+NUM_OSD=3
+
+# create the files that will represent the extra disks for the containers
+mkdir $FILES_DIR
+num=0
+for (( i = 1; i <= $NUM_OSD; i++)); do
+
+	for (( j = 0; j < $NUM_DISKS; j++)); do
+		FILE="osd$i-disk$j"
+		HOST_FILE="$FILES_DIR/$FILE"
+
+		[ -f $HOST_FILE ]  || fallocate -l 1G $HOST_FILE
+		sudo losetup -f $HOST_FILE
+		disk=$(losetup --associated $HOST_FILE | cut -f1 -d:)
+		devs[$num]=$disk
+		((num = $num + 1))
+		echo "Created file $HOST_FILE and mount it on $disk" | systemd-cat -t $SERVICE_NAME
+
+	done
+done
 
 echo "Started service" | systemd-cat -t $SERVICE_NAME
 

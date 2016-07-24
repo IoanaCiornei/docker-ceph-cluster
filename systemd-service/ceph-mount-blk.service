@@ -2,7 +2,7 @@
 Description=Create and mount loop devices to be used as ceph storage
 
 [Service]
-ExecStart=/usr/local/bin/ceph-mount-blk
+ExecStart=/home/pis/src/licenta/docker-ceph-cluster/systemd-service/ceph-mount-blk
 Type=forking
 
 [Install]

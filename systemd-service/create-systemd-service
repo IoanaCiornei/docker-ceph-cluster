@@ -5,9 +5,6 @@ SERVICE_UNIT=$SERVICE_NAME".service"
 SERVICE_PATH="/etc/systemd/system/"$SERVICE_NAME".service"
 EXEC_PATH="/usr/local/bin"
 
-# move executable in $PATH
-sudo cp $SERVICE_NAME $EXEC_PATH
-
 # move the service unit file to the right place
 sudo cp $SERVICE_UNIT $SERVICE_PATH
 sudo chmod 664 $SERVICE_PATH

@@ -5,7 +5,8 @@ NUM_MON=3
 ((NUM_NODES = $NUM_MON + $NUM_OSD + 1))
 
 NUM_DISKS=4
-FILES_DIR=../dev-files
+CURRENT_FOLDER=$(pwd)
+FILES_DIR=$(realpath ..)"/dev-files"
 
 LOOP_MAJOR=7
 START_MINOR=200
