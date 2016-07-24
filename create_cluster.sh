@@ -50,7 +50,7 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
 
 	else
-		# admin or mon container
+		# admin, mon, client container
 		sudo docker run -d -it \
 			--privileged \
 			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \

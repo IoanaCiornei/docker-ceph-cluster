@@ -32,6 +32,8 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	elif (( i <= $NUM_OSD )); then
 		node="osd$i"
 		osds="$osds $node"
+	elif ((i == $NUM_NODES - 1 )); then
+		node="client"
 	else
 		node="mon"$(($i - $NUM_OSD))
 		mons="$mons $node"
