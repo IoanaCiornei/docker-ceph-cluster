@@ -14,38 +14,6 @@ sudo docker build -t ceph_node .
 
 # array of devices - devs
 
-# create the files that will represent the extra disks for the containers
-mkdir $FILES_DIR
-num=0
-for (( i = 1; i <= $NUM_OSD; i++)); do
-
-	for (( j = 0; j < $NUM_DISKS; j++)); do
-		FILE="osd$i-disk$j"
-		HOST_FILE="$FILES_DIR/$FILE"
-
-		[ -f $HOST_FILE ]  || fallocate -l 1G $HOST_FILE
-		sudo losetup -f $HOST_FILE
-		disk=$(losetup --associated $HOST_FILE | cut -f1 -d:)
-		devs[$num]=$disk
-		((num = $num + 1))
-		echo " DISK _____________ $disk"
-	done
-done
-
-
-# partition the disks on the OSDs
-num=0
-for (( i = 1; i <= $NUM_OSD; i++)); do
-	for (( j = 0; j < 3 ; j++)); do
-		FILE=${devs[$num]} ; ((num++))
-		sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
-		sudo mkfs.xfs $FILE -f
-	done
-	FILE=${devs[$num]} ; ((num++))
-	sudo parted -s $FILE mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%
-done
-
-
 # create NUM_NODES containers
 num=0
 for (( i = 0; i < $NUM_NODES; i++)); do

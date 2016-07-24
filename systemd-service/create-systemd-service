@@ -3,11 +3,18 @@
 SERVICE_NAME=ceph-mount-blk
 SERVICE_UNIT=$SERVICE_NAME".service"
 SERVICE_PATH="/etc/systemd/system/"$SERVICE_NAME".service"
-EXEC_PATH="/usr/local/bin"
+
+EXEC_START="ceph-mount-blk"
+EXEC_STOP="ceph-umount-blk"
+EXEC_PATH="/opt/ceph/"
 
 # move the service unit file to the right place
 sudo cp $SERVICE_UNIT $SERVICE_PATH
 sudo chmod 664 $SERVICE_PATH
+
+# move the scripts in /opt/ceph
+sudo mkdir $EXEC_PATH
+sudo cp $EXEC_START $EXEC_STOP $EXEC_PATH
 
 # notify systemd that a new service file exists
 systemctl daemon-reload

@@ -4,6 +4,8 @@ SERVICE_NAME=ceph-mount-service
 FILES_DIR=/home/pis/src/licenta/dev-files
 NUM_DISKS=4
 NUM_OSD=3
+LOGGER="Ceph Docker Disk mounted on"
+
 
 # create the files that will represent the extra disks for the containers
 mkdir $FILES_DIR
@@ -19,10 +21,21 @@ for (( i = 1; i <= $NUM_OSD; i++)); do
 		disk=$(losetup --associated $HOST_FILE | cut -f1 -d:)
 		devs[$num]=$disk
 		((num = $num + 1))
-		echo "Created file $HOST_FILE and mount it on $disk" | systemd-cat -t $SERVICE_NAME
+		echo "$LOGGER $disk" | systemd-cat -t $SERVICE_NAME
 
 	done
 done
 
-echo "Started service" | systemd-cat -t $SERVICE_NAME
+
+# partition the disks on the OSDs
+num=0
+for (( i = 1; i <= $NUM_OSD; i++)); do
+	for (( j = 0; j < 3 ; j++)); do
+		FILE=${devs[$num]} ; ((num++))
+		sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
+		sudo mkfs.xfs $FILE -f
+	done
+	FILE=${devs[$num]} ; ((num++))
+	sudo parted -s $FILE mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%
+done
 
