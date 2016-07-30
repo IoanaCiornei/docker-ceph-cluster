@@ -42,6 +42,8 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 
 		sudo docker run -d -it \
 			--privileged \
+			--cap-add=ALL \
+			-v /lib/modules:/lib/modules \
 			-v $FILE1:$FILE1 \
 			-v $FILE1_p1:$FILE1_p1 \
 			-v $FILE2:$FILE2 \
@@ -54,11 +56,12 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 			-v $FILE4_p3:$FILE4_p3 \
 			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
-
 	else
 		# admin, mon, client container
 		sudo docker run -d -it \
 			--privileged \
+			--cap-add=ALL \
+			-v /lib/modules:/lib/modules \
 			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
 	fi
@@ -88,7 +91,7 @@ done
 
 
 # copy script to the admin node
-scp cluster_conf admin.sh $USER@admin:.
+scp conf admin.sh $USER@admin:.
 
 echo "Running nodes in cluster:"
 sudo docker ps
