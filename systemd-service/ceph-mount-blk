@@ -16,7 +16,7 @@ for (( i = 1; i <= $NUM_OSD; i++)); do
 		FILE="osd$i-disk$j"
 		HOST_FILE="$FILES_DIR/$FILE"
 
-		[ -f $HOST_FILE ]  || fallocate -l 1G $HOST_FILE
+		[ -f $HOST_FILE ]  || fallocate -l 2G $HOST_FILE
 		sudo losetup -f $HOST_FILE
 		disk=$(losetup --associated $HOST_FILE | cut -f1 -d:)
 		devs[$num]=$disk
@@ -32,10 +32,13 @@ num=0
 for (( i = 1; i <= $NUM_OSD; i++)); do
 	for (( j = 0; j < 3 ; j++)); do
 		FILE=${devs[$num]} ; ((num++))
-		sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
-		sudo mkfs.xfs $FILE -f
+		echo "Running mkfs on " $FILE | systemd-cat -t $SERVICE_NAME
+		#sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
+		#sudo mkfs.xfs $FILE -f
 	done
 	FILE=${devs[$num]} ; ((num++))
 	sudo parted -s $FILE mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%
 done
 
+
+echo "Exited" | systemd-cat -t $SERVICE_NAME

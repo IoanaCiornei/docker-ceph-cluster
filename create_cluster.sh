@@ -15,6 +15,9 @@ sudo docker build -t ceph_node .
 # temporary TODO
 sudo systemctl start ceph-mount-blk.service
 
+read
+
+
 # array of loop devices
 loop_devs=$(journalctl -b | grep "$LOGGER" | tail -n $NUM_DEVS | awk '{print $NF}')
 num=0
@@ -66,11 +69,6 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 	# Wait for container to go up before issuing any more commands
 	while ! (sshpass -p $PASSWORD ssh $USER@${node_name[$i]} echo -e 'Host $HOSTNAME is up!'); do :; done
 
-	# TODO
-	# 1. generate keys on host of there aren't
-	# 2. copy them to the containers with docker
-	# 3. add UserKnownHostsFile /dev/null  + StrictHostKeyChecking no
-
 	# copy my keys to the other hosts
 	sshpass -p $PASSWORD scp -v ~/.ssh/id_rsa ~/.ssh/id_rsa.pub $USER@${node_name[i]}:~/.ssh/
 	sshpass -p $ROOT_PASSWORD scp -v ~/.ssh/id_rsa ~/.ssh/id_rsa.pub root@${node_name[i]}:~/.ssh/
@@ -83,8 +81,14 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 
 	ssh $USER@${node_name[$i]} "echo -e 'Host *\n\tStrictHostKeyChecking no' >> ~/.ssh/config"
 
+	# run udevadm settle on the container in order to wait for all the devices to be discovered
+	ssh $USER@${node_name[$i]} "udevadm settle"
+
 done
 
+
+# copy script to the admin node
+scp cluster_conf admin.sh $USER@admin:.
 
 echo "Running nodes in cluster:"
 sudo docker ps
