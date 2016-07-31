@@ -41,3 +41,11 @@ ssh osd3 "sudo systemctl enable ceph-osd.target && sudo systemctl start ceph-osd
 ssh mon1 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon.target && sudo systemctl status ceph-mon.target"
 ssh mon2 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon.target && sudo systemctl status ceph-mon.target"
 ssh mon3 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon.target && sudo systemctl status ceph-mon.target"
+
+cat << EndOfHelp
+Ceph cluster created.
+Now restart the cluster by running:
+	./stop_cluster.sh && ./start_cluster.sh
+on the host system in the docker-ceph-cluster dyrectory
+
+EndOfHelp
