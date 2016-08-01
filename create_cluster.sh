@@ -15,8 +15,6 @@ sudo docker build -t ceph_node .
 # temporary TODO
 sudo systemctl start ceph-mount-blk.service
 
-read
-
 
 # array of loop devices
 loop_devs=$(journalctl -b | grep "$LOGGER" | tail -n $NUM_DEVS | awk '{print $NF}')
@@ -39,11 +37,9 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 		FILE2=${devs[$num]} ; FILE2_p1="${devs[$num]}p1"; ((num++))
 		FILE3=${devs[$num]} ; FILE3_p1="${devs[$num]}p1"; ((num++))
 		FILE4=${devs[$num]} ; FILE4_p1="${devs[$num]}p1"; FILE4_p2="${devs[$num]}p2"; FILE4_p3="${devs[$num]}p3"; ((num++))
-
+		
 		sudo docker run -d -it \
 			--privileged \
-			--cap-add=ALL \
-			-v /lib/modules:/lib/modules \
 			-v $FILE1:$FILE1 \
 			-v $FILE1_p1:$FILE1_p1 \
 			-v $FILE2:$FILE2 \
@@ -60,8 +56,6 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 		# admin, mon, client container
 		sudo docker run -d -it \
 			--privileged \
-			--cap-add=ALL \
-			-v /lib/modules:/lib/modules \
 			-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 			--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node
 	fi
@@ -84,14 +78,11 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 
 	ssh $USER@${node_name[$i]} "echo -e 'Host *\n\tStrictHostKeyChecking no' >> ~/.ssh/config"
 
-	# run udevadm settle on the container in order to wait for all the devices to be discovered
-	ssh $USER@${node_name[$i]} "udevadm settle"
-
 done
 
 
 # copy script to the admin node
-scp conf admin.sh $USER@admin:.
+scp conf admin1.sh admin2.sh $USER@admin:.
 
 echo "Running nodes in cluster:"
 sudo docker ps

@@ -9,7 +9,7 @@ cat ~/conf >> ceph.conf
 cat ceph.conf
 sleep 1
 
-ceph-deploy install admin mon1 mon2 mon3 osd1 osd2 osd3
+ceph-deploy install admin mon1 mon2 mon3 osd1 osd2 osd3 client
 ceph-deploy mon create-initial
 ceph-deploy gatherkeys mon1
 sleep 1
@@ -26,7 +26,7 @@ ceph-deploy disk zap osd3:loop8 osd3:loop9 osd3:loop10
 ceph-deploy osd create osd3:loop8:/dev/loop11p1 osd3:loop9:/dev/loop11p2 osd3:loop10:/dev/loop11p3
 sleep 1
 
-ceph-deploy admin admin mon1 mon2 mon3 osd1 osd2 osd3
+ceph-deploy admin admin mon1 mon2 mon3 osd1 osd2 osd3 client
 sudo chmod +r /etc/ceph/ceph.client.admin.keyring
 sleep 1
 
@@ -43,9 +43,11 @@ ssh mon2 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon
 ssh mon3 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon.target && sudo systemctl status ceph-mon.target"
 
 cat << EndOfHelp
+*******************************************************
 Ceph cluster created.
 Now restart the cluster by running:
 	./stop_cluster.sh && ./start_cluster.sh
 on the host system in the docker-ceph-cluster dyrectory
+*******************************************************
 
 EndOfHelp
