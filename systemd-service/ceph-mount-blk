@@ -33,8 +33,8 @@ for (( i = 1; i <= $NUM_OSD; i++)); do
 	for (( j = 0; j < 3 ; j++)); do
 		FILE=${devs[$num]} ; ((num++))
 		echo "Running mkfs on " $FILE | systemd-cat -t $SERVICE_NAME
-		#sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
-		#sudo mkfs.xfs $FILE -f
+		sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
+		sudo mkfs.xfs $FILE -f
 	done
 	FILE=${devs[$num]} ; ((num++))
 	sudo parted -s $FILE mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%
