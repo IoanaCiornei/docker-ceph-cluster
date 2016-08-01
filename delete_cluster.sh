@@ -18,3 +18,6 @@ sudo docker network rm $CLUSTER_NETWORK
 
 # TEMPORARY TODO stop the host ceph service
 sudo systemctl stop ceph-mount-blk.service
+
+# delete the files
+sudo rm -rf ../dev-files/
