@@ -1,23 +1,30 @@
 #! /bin/bash
 
+MODULE='DELETE_CEPH_CLUSTER'
+
 source ./settings.sh
 
-# delete the containers
 for (( i = 0; i < $NUM_NODES; i++)); do
-	echo "Deleting Docker container ${node_name[$i]}..."
 	((j = i + 2))
 	NODE_IP="$IP_NETWORK$j"
-	sudo docker rm ${node_name[$i]}
 
-	# delete entry in /etc/hosts
+	log $MODULE "Deleting Docker container ${node_name[$i]}..."
+	sudo docker rm ${node_name[$i]} &> /dev/null
+
+	log $MODULE "Delete entry from /etc/hosts..."
 	sudo sed -i '$ d' /etc/hosts
 done
 
-# delete the cluster network
-sudo docker network rm $CLUSTER_NETWORK
+log $MODULE "Delete cluster network..."
+sudo docker network rm $CLUSTER_NETWORK &> /dev/null
 
-# TEMPORARY TODO stop the host ceph service
-sudo systemctl stop ceph-mount-blk.service
+status=$(systemctl is-active ceph-mount-blk.service)
+if [[ "$status" == "active" ]]; then
+	log $MODULE "Stop ceph-mount-blk service..."
+	sudo systemctl stop ceph-mount-blk.service
+fi
 
-# delete the files
+log $MODULE "Delete the files mounted as block devices..."
 sudo rm -rf ../dev-files/
+
+log $MODULE "Delete cluster... Finished!"

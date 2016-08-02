@@ -43,6 +43,7 @@ ssh mon2 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon
 ssh mon3 "sudo systemctl enable ceph-mon.target && sudo systemctl start ceph-mon.target && sudo systemctl status ceph-mon.target"
 
 cat << EndOfHelp
+
 *******************************************************
 Ceph cluster created.
 Now restart the cluster by running:
