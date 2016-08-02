@@ -1,0 +1,45 @@
+#! /bin/bash
+
+
+function usage {
+cat << EndOfUsage
+Usage:
+	ceph-cluster [create|start|stop|delete|restart]
+
+		create - builds the Docker base image, starts the containers, install ceph on all the nodes
+			and creates the initial configuration of the cluster
+		stop   - shutdowns all the container without deleting their contents
+		start  - starts all the cluste nodes previously stopped
+		delete - deletes a cluster, all its nodes and any images that existed
+		restart - it does what it says
+
+Description:
+	ceph-cluster users create a Ceph Cluster hosted entirely on a single machine.
+	Cluster nodes are Docker containers that run a full init system, a ssh server and have
+	full connectivity between them.
+
+EndOfUsage
+
+}
+
+case $1 in
+	"create")
+		./create_cluster.sh
+		;;
+	"stop")
+		./stop_cluster.sh
+		;;
+	"start")
+		./start_cluster.sh
+		;;
+	"delete")
+		./delete_cluster.sh
+		;;
+	"restart")
+		./stop_cluster.sh
+		./start_cluster.sh
+		;;
+	*)
+		usage
+		;;
+esac
