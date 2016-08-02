@@ -43,7 +43,8 @@ for (( i = 0; i < $NUM_NODES; i++)); do
 done
 
 LOGGER="Ceph Docker Disk mounted on"
+DEBUG_FILE="debug.txt"
 
 function log {
-	echo "[$1] $2"
+	echo $3 "[$1] $2" | tee -a $DEBUG_FILE
 }
