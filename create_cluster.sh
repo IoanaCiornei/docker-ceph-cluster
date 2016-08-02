@@ -90,3 +90,6 @@ log $MODULE "Create cluster nodes... Finished"
 log $MODULE "Copy admin script on container..."
 scp conf admin1.sh $USER@admin:. &>> $DEBUG_FILE
 
+log $MODULE "Deploy cluster on newly create Docker containers"
+ssh $USER@admin "/home/$USER/admin1.sh" &>> $DEBUG_FILE
+
