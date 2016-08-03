@@ -7,8 +7,7 @@ source ./ceph-cluster-stop
 MODULE='CREATE_CEPH_CLUSTER'
 
 function create_cluster {
-	echo "create"
-	read
+
 	log $MODULE "Copy id_rsa to localhost..."
 	ssh-copy-id localhost &>> $DEBUG_FILE
 

@@ -6,7 +6,6 @@ MODULE='STOP_CEPH_CLUSTER'
 
 function stop_cluster {
 
-	echo "stop"; read
 	for (( i = 0; i < $NUM_NODES; i++)); do
 		((j = i + 2))
 		NODE_IP="$IP_NETWORK$j"
