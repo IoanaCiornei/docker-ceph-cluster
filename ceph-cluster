@@ -1,5 +1,9 @@
 #! /bin/bash
 
+source ./ceph-cluster-create
+source ./ceph-cluster-delete
+source ./ceph-cluster-start
+source ./ceph-cluster-stop
 
 function usage {
 cat << EndOfUsage
@@ -24,22 +28,18 @@ EndOfUsage
 
 case $1 in
 	"create")
-		./create_cluster.sh
-		;;
+		create_cluster; export CEPH_CLUSTER_STATUS=RUNNING;;
 	"stop")
-		./stop_cluster.sh
-		;;
+		stop_cluster; export CEPH_CLUSTER_STATUS=STOPPED;;
 	"start")
-		./start_cluster.sh
-		;;
+		start_cluster; export CEPH_CLUSTER_STATUS=RUNNING;;
 	"delete")
-		./delete_cluster.sh
-		;;
+		delete_cluster; export CEPH_CLUSTER_STATUS=NON_EXISTENT;;
 	"restart")
-		./stop_cluster.sh
-		./start_cluster.sh
-		;;
+		stop_cluster && start_cluster;;
+	"status")
+		echo "Ceph cluster is $CEPH_CLUSTER_STATUS";
+		sudo docker ps ;;
 	*)
-		usage
-		;;
+		usage;;
 esac

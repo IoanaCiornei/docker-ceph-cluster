@@ -1,13 +1,14 @@
 #! /bin/bash
 
-source ./settings.sh
-source ./start_cluster.sh
-source ./stop_cluster.sh
+source ./ceph-cluster-settings
+source ./ceph-cluster-start
+source ./ceph-cluster-stop
 
 MODULE='CREATE_CEPH_CLUSTER'
 
 function create_cluster {
-
+	echo "create"
+	read
 	log $MODULE "Copy id_rsa to localhost..."
 	ssh-copy-id localhost &>> $DEBUG_FILE
 
