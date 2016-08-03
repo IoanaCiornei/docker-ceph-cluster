@@ -1,6 +1,7 @@
 #! /bin/bash
 
 source ./ceph-cluster-settings
+source ./ceph-cluster-util
 source ./ceph-cluster-start
 source ./ceph-cluster-stop
 
@@ -91,11 +92,17 @@ function create_cluster {
 	sudo docker ps
 	log $MODULE "Create cluster nodes... Finished"
 
+	log $MODULE "Generate ceph configuration file based on all the info provided in settings..."
+	generate_conf
+
+	log $MODULE "Generate deploy script to be run on admin container..."
+	generate_deploy_script
+
 	log $MODULE "Copy admin script on container..."
-	scp conf admin1.sh $USER@admin:. &>> $DEBUG_FILE
+	scp conf ceph-cluster-deploy $USER@admin:. &>> $DEBUG_FILE
 
 	log $MODULE "Deploy cluster on newly create Docker containers"
-	ssh $USER@admin "/home/$USER/admin1.sh" &>> $DEBUG_FILE
+	ssh $USER@admin "/home/$USER/ceph-cluster-deploy" &>> $DEBUG_FILE
 
 	log $MODULE "Restart cluster..."
 	stop_cluster && start_cluster

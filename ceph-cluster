@@ -28,13 +28,13 @@ EndOfUsage
 
 case $1 in
 	"create")
-		create_cluster; export CEPH_CLUSTER_STATUS=RUNNING;;
+		create_cluster; export CEPH_CLUSTER_STATUS="RUNNING";;
 	"stop")
-		stop_cluster; export CEPH_CLUSTER_STATUS=STOPPED;;
+		stop_cluster; export CEPH_CLUSTER_STATUS="STOPPED";;
 	"start")
-		start_cluster; export CEPH_CLUSTER_STATUS=RUNNING;;
+		start_cluster; export CEPH_CLUSTER_STATUS="RUNNING";;
 	"delete")
-		delete_cluster; export CEPH_CLUSTER_STATUS=NON_EXISTENT;;
+		delete_cluster; export CEPH_CLUSTER_STATUS="NON_EXISTENT";;
 	"restart")
 		stop_cluster && start_cluster;;
 	"status")
