@@ -92,6 +92,8 @@ function create_cluster {
 	sudo docker ps
 	log $MODULE "Create cluster nodes... Finished"
 
+	exit
+
 	log $MODULE "Generate ceph configuration file based on all the info provided in settings..."
 	generate_conf
 

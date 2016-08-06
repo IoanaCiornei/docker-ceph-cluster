@@ -59,6 +59,7 @@ RUN curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubuserconte
 RUN echo -e "\n" | vim -c "PlugInstall"; echo ":q"
 
 
+RUN mkdir -p /home/pis/src/licenta/
 USER root
 
 ###### ssh + systemd  ######

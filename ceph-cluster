@@ -4,6 +4,7 @@ source ./ceph-cluster-create
 source ./ceph-cluster-delete
 source ./ceph-cluster-start
 source ./ceph-cluster-stop
+source ./ceph-cluster-util
 
 function usage {
 cat << EndOfUsage
@@ -40,6 +41,10 @@ case $1 in
 	"status")
 		echo "Ceph cluster is $CEPH_CLUSTER_STATUS";
 		sudo docker ps ;;
+	"stop-services")
+		ceph_services_stop;;
+	"start-services")
+		ceph_services_start;;
 	*)
 		usage;;
 esac

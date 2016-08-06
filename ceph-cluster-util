@@ -27,16 +27,18 @@ function generate_deploy_script {
 	cat <<EOT > ceph-cluster-deploy
 #! /bin/bash
 
+ceph-deploy install $nodes
+sleep 1
+
+echo "AICIIIIIIIIIIIIIIIIIIIIII Pune si TU noile binare!!!"
+read
+
 mkdir ceph-deploy
 cd ceph-deploy
 
-ceph-deploy new mon1 mon2 mon3
-
 cat ~/conf >> ceph.conf
 cat ceph.conf
-sleep 1
-
-ceph-deploy install $nodes
+ceph-deploy new mon1 mon2 mon3
 ceph-deploy mon create-initial
 ceph-deploy gatherkeys mon1
 sleep 1
@@ -82,4 +84,20 @@ EndOfHelp
 EOT
 
 	chmod +x ceph-cluster-deploy
+}
+
+function ceph_services_stop {
+	for node in $nodes; do
+		ssh root@$node "sudo systemctl stop ceph-osd.target"
+		ssh root@$node "sudo systemctl stop ceph-mon.target"
+		ssh root@$node "sudo systemctl stop ceph"
+	done
+}
+
+function ceph_services_start {
+	for node in $nodes; do
+		ssh root@$node "sudo systemctl start ceph-osd.target"
+		ssh root@$node "sudo systemctl start ceph-mon.target"
+		ssh root@$node "sudo systemctl start ceph"
+	done
 }
