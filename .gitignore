@@ -1,2 +1,4 @@
 *.swp
 debug*
+ceph-cluster-deploy
+conf
