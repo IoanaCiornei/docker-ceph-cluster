@@ -1,4 +1,4 @@
-FROM debian:jessie
+FROM ubuntu:16.04
 MAINTAINER Ioana Ciornei <ciorneiioana@gmail.com>
 
 ENV container docker
@@ -26,6 +26,8 @@ RUN echo deb http://download.ceph.com/debian-jewel/ $(lsb_release -sc) main | te
 RUN apt-get -y update
 RUN apt-get install -y ceph-deploy
 
+
+USER root
 
 ###### Create USER ######
 RUN useradd --create-home --shell /bin/bash --groups sudo pis
