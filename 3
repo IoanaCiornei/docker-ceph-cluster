@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /bin/bas
 
 source ./ceph-cluster-settings
 
@@ -15,7 +15,7 @@ osd pool default pgp num = 256
 
 #Choose a reasonable crush leaf type
 #0 for a 1-node cluster.
-#1 for a multi node cluster in a single rack
+#1 for a muGlti node cluster in a single rack
 #2 for a multi node, multi chassis cluster with multiple hosts in a chassis
 #3 for a multi node cluster with hosts across racks, etc.
 osd crush chooseleaf type = 1
@@ -102,37 +102,36 @@ function ceph_services_start {
 	done
 }
 
-debs[1]="ceph-mon_10.2.2-1_amd64.deb"
-debs[2]="ceph-mds_10.2.2-1_amd64.deb"
-debs[3]="ceph-base_10.2.2-1_amd64.deb"
-debs[4]="ceph-common_10.2.2-1_amd64.deb"
-debs[5]="ceph_10.2.2-1_amd64.deb"
+debs[1]="ceph_10.2.2-1_amd64.deb"
+debs[2]="ceph-base_10.2.2-1_amd64.deb"
+debs[3]="ceph-common_10.2.2-1_amd64.deb"
+debs[4]="ceph-mds_10.2.2-1_amd64.deb"
+debs[5]="ceph-mon_10.2.2-1_amd64.deb"
 debs[6]="ceph-osd_10.2.2-1_amd64.deb"
-debs[7]="python-rbd_10.2.2-1_amd64.deb"
+debs[7]="libcephfs1_10.2.2-1_amd64.deb"
 debs[8]="python-cephfs_10.2.2-1_amd64.deb"
-debs[9]="librados2_10.2.2-1_amd64.deb"
-debs[10]="python-rados_10.2.2-1_amd64.deb"
-debs[11]="librbd1_10.2.2-1_amd64.deb"
-debs[12]="libcephfs1_10.2.2-1_amd64.deb"
+
+function is_necessary_deb {
+	for ((i = 1; i <= ${#debs[@]}; i++)); do
+		if [$1 = ${debs[$1]}]; then
+			return 0;
+		fi
+	done
+	return -1
+}
 
 function copy_debs {
 	MODULE="INSTALL_DEBS"
 	DEB_PATH=$1
+	FILES="$DEB_PATH/*.deb"
 
 	for node in $nodes; do
 		log $MODULE "Copy .deb files from folder $DEB_PATH to node $node"
 		ssh $node 'mkdir -p debs'
-		ssh $node 'sudo rm -rf etc/apt/sources.list.d/ceph.list'
-		for (( i = 1; i <= ${#debs[@]}; i++ )); do
-			file="$DEB_PATH/${debs[$i]}"
-			deb=${debs[$i]}
-			pkg=$(echo $deb | cut -d'_' -f1)
-			echo $pkg
-			scp $file $node:./debs/
-			ssh $node "sudo dpkg -i ~/debs/$deb"
-			ssh $node "sudo apt-mark hold $pkg"
+		for file in $FILES; do
+			is_necessary_deb "$file" && echo $file
 		done
-		ssh $node "sudo apt-get install -f && sudo apt-get update && sudo apt-get upgrade"
+		#scp $file  $node:./debs/
 	done
 }
 

@@ -45,6 +45,8 @@ case $1 in
 		ceph_services_stop;;
 	"start-services")
 		ceph_services_start;;
+	"copy-debs")
+		copy_debs $2;;
 	*)
 		usage;;
 esac
