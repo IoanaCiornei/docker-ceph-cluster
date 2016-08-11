@@ -47,6 +47,8 @@ case $1 in
 		ceph_services_start;;
 	"copy-debs")
 		copy_debs $2;;
+	"install-deps")
+		install_dependencies;;
 	*)
 		usage;;
 esac

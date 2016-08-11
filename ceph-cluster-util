@@ -96,16 +96,21 @@ function ceph_services_stop {
 
 function ceph_services_start {
 	for node in $nodes; do
-		ssh root@$node "sudo systemctl start ceph-osd.target"
-		ssh root@$node "sudo systemctl start ceph-mon.target"
+		log $MODULE "start ceph on $node"
 		ssh root@$node "sudo systemctl start ceph"
+
+		log $MODULE "start ceph-osd.target on $node"
+		ssh root@$node "sudo systemctl start ceph-osd.target"
+
+		log $MODULE "start ceph-mon.target on $node"
+		ssh root@$node "sudo systemctl start ceph-mon.target"
 	done
 }
 
-debs[1]="ceph-mon_10.2.2-1_amd64.deb"
-debs[2]="ceph-mds_10.2.2-1_amd64.deb"
-debs[3]="ceph-base_10.2.2-1_amd64.deb"
-debs[4]="ceph-common_10.2.2-1_amd64.deb"
+debs[1]="ceph-common_10.2.2-1_amd64.deb"
+debs[2]="ceph-base_10.2.2-1_amd64.deb"
+debs[3]="ceph-mon_10.2.2-1_amd64.deb"
+debs[4]="ceph-mds_10.2.2-1_amd64.deb"
 debs[5]="ceph_10.2.2-1_amd64.deb"
 debs[6]="ceph-osd_10.2.2-1_amd64.deb"
 debs[7]="python-rbd_10.2.2-1_amd64.deb"
@@ -114,15 +119,18 @@ debs[9]="librados2_10.2.2-1_amd64.deb"
 debs[10]="python-rados_10.2.2-1_amd64.deb"
 debs[11]="librbd1_10.2.2-1_amd64.deb"
 debs[12]="libcephfs1_10.2.2-1_amd64.deb"
+debs[13]="librgw2_10.2.2-1_amd64.deb"
+debs[14]="libradosstriper1_10.2.2-1_amd64.deb"
 
 function copy_debs {
 	MODULE="INSTALL_DEBS"
 	DEB_PATH=$1
 
 	for node in $nodes; do
+	#node=admin
 		log $MODULE "Copy .deb files from folder $DEB_PATH to node $node"
-		ssh $node 'mkdir -p debs'
 		ssh $node 'sudo rm -rf etc/apt/sources.list.d/ceph.list'
+		ssh $node 'mkdir -p debs'
 		for (( i = 1; i <= ${#debs[@]}; i++ )); do
 			file="$DEB_PATH/${debs[$i]}"
 			deb=${debs[$i]}
@@ -136,3 +144,15 @@ function copy_debs {
 	done
 }
 
+
+function install_dependencies {
+	MODULE="INSTALL__DEPENDENCIES"
+
+	for node in $nodes; do
+		log $MODULE "Copying install_deps.sh script..."
+		scp deps install_deps.sh $node:.
+
+		log $MODULE "Initiate install command..."
+		ssh $node 'nohup ./install_deps.sh < /dev/null &'
+	done
+}
