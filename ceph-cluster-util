@@ -140,7 +140,7 @@ function copy_debs {
 			ssh $node "sudo dpkg -i ~/debs/$deb"
 			ssh $node "sudo apt-mark hold $pkg"
 		done
-		ssh $node "sudo apt-get install -f && sudo apt-get update && sudo apt-get upgrade"
+		ssh $node "sudo apt-get update -y --fix-missing && sudo apt-get install -y -f && sudo apt-get update -y && sudo apt-get upgrade -y"
 	done
 }
 
