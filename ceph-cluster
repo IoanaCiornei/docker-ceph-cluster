@@ -33,17 +33,17 @@ EndOfUsage
 
 case $1 in
 	"create")
-		create_cluster; export CEPH_CLUSTER_STATUS="RUNNING";;
+		create_cluster;;
 	"stop")
-		stop_cluster; export CEPH_CLUSTER_STATUS="STOPPED";;
+		stop_cluster;;
 	"start")
-		start_cluster; export CEPH_CLUSTER_STATUS="RUNNING";;
+		start_cluster;;
 	"delete")
-		delete_cluster; export CEPH_CLUSTER_STATUS="NON_EXISTENT";;
+		delete_cluster;;
 	"restart")
 		stop_cluster && start_cluster;;
 	"status")
-		echo "Ceph cluster is $CEPH_CLUSTER_STATUS";
+		echo "Ceph cluster:";
 		sudo docker ps ;;
 	"stop-services")
 		ceph_services_stop;;
