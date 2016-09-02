@@ -32,27 +32,27 @@ EndOfUsage
 }
 
 case $1 in
-	"create")
-		create_cluster;;
-	"stop")
-		stop_cluster;;
-	"start")
-		start_cluster;;
-	"delete")
-		delete_cluster;;
-	"restart")
-		stop_cluster && start_cluster;;
-	"status")
-		echo "Ceph cluster:";
-		sudo docker ps ;;
-	"stop-services")
-		ceph_services_stop;;
-	"start-services")
-		ceph_services_start;;
-	"copy-debs")
-		copy_debs $2;;
-	"install-deps")
-		install_dependencies;;
-	*)
-		usage;;
+"create")
+	create_cluster;;
+"stop")
+	stop_cluster;;
+"start")
+	start_cluster;;
+"delete")
+	delete_cluster;;
+"restart")
+	stop_cluster && start_cluster;;
+"status")
+	echo "Ceph cluster:";
+	sudo docker ps ;;
+"stop-services")
+	ceph_services_stop;;
+"start-services")
+	ceph_services_start;;
+"copy-debs")
+	copy_debs $2;;
+"install-deps")
+	install_dependencies;;
+*)
+	usage;;
 esac
