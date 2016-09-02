@@ -33,7 +33,7 @@ EndOfUsage
 
 case $1 in
 "create")
-	create_cluster;;
+	create_cluster "${@:2}";;
 "stop")
 	stop_cluster;;
 "start")

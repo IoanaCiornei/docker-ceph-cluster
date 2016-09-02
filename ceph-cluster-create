@@ -6,8 +6,34 @@ source ./ceph-cluster-start
 source ./ceph-cluster-stop
 
 MODULE='CREATE_CEPH_CLUSTER'
+MODE='auto'
+DEBS='none'
+
+function verify_params {
+
+	for option in "$@"; do
+		case "$option" in 
+		"--mode="*)
+			MODE=${option#*=};;
+		"--debs="*)
+			DEBS=${option#*=};;
+		*)
+			echo "Invalid option: $option"
+			exit
+		esac
+	done
+
+	if [[ $MODE = "manual" && $DEBS = "none" ]];  then
+		echo "If manual mode is chosen you must specify a debs folder"
+		exit
+	fi
+}
 
 function create_cluster {
+
+	verify_params "$@"
+
+	exit
 
 	log $MODULE "Copy id_rsa to localhost..."
 	ssh-copy-id localhost &>> $DEBUG_FILE
