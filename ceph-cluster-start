@@ -12,6 +12,7 @@ function start_cluster {
 
 		log $MODULE "Start Docker container ${node_name[$i]}..."
 		sudo docker start ${node_name[$i]} &>> $DEBUG_FILE
+		#sleep 10
 	done
 
 	log $MODULE "Containers in cluster:"

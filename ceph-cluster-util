@@ -99,6 +99,9 @@ function ceph_services_start {
 		log $MODULE "start ceph on $node"
 		ssh root@$node "sudo systemctl start ceph"
 
+		log $MODULE "stop ceph-osd.target on $node"
+		ssh root@$node "sudo systemctl stop ceph-osd.target"
+
 		log $MODULE "start ceph-osd.target on $node"
 		ssh root@$node "sudo systemctl start ceph-osd.target"
 

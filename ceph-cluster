@@ -11,12 +11,16 @@ cat << EndOfUsage
 Usage:
 	ceph-cluster [create|start|stop|delete|restart]
 
-		create - builds the Docker base image, starts the containers, install ceph on all the nodes
-			and creates the initial configuration of the cluster
-		stop   - shutdowns all the container without deleting their contents
-		start  - starts all the cluste nodes previously stopped
-		delete - deletes a cluster, all its nodes and any images that existed
-		restart - it does what it says
+		create			- builds the Docker base image, starts the containers, install ceph on all the nodes
+						and creates the initial configuration of the cluster
+		stop			- shutdowns all the container without deleting their contents
+		start			- starts all the cluste nodes previously stopped
+		delete			- deletes a cluster, all its nodes and any images that existed
+		restart			- it does what it says
+		install-debs		- on each cluster node install ceph dependencies
+		copy-debs <folder>	- given a path where you have build the deb files install them on the nodes
+		stop-services		- stop all ceph services on cluster nodes
+		start-services		- start all ceph services on cluster nodes
 
 Description:
 	ceph-cluster users create a Ceph Cluster hosted entirely on a single machine.
