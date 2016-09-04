@@ -8,14 +8,26 @@ EXEC_START="ceph-mount-blk"
 EXEC_STOP="ceph-umount-blk"
 EXEC_PATH="/opt/ceph/"
 
-# move the service unit file to the right place
-sudo cp $SERVICE_UNIT $SERVICE_PATH
-sudo chmod 664 $SERVICE_PATH
 
-# move the scripts in /opt/ceph
-sudo mkdir $EXEC_PATH
-sudo cp $EXEC_START $EXEC_STOP $EXEC_PATH
 
-# notify systemd that a new service file exists
-systemctl daemon-reload
+if [[ $1 == "install" ]]; then
+	# move the service unit file to the right place
+	sudo cp $SERVICE_UNIT $SERVICE_PATH
+	sudo chmod 664 $SERVICE_PATH
+
+	# move the scripts in /opt/ceph
+	sudo mkdir $EXEC_PATH
+	sudo cp $EXEC_START $EXEC_STOP $EXEC_PATH
+
+	# notify systemd that a new service file exists
+	systemctl daemon-reload
+elif [[ $1 == "uninstall" ]]; then
+
+	# remove service unit and executables
+	sudo rm -rf $SERVICE_PATH/$SERVICE_UNIT
+	sudo rm -rf $EXEC_PATH
+
+	# reload systemd to notify that the service was uninstalled
+	systemctl daemon-reload
+fi
 
