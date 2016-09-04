@@ -27,12 +27,6 @@ function generate_deploy_script {
 	cat <<EOT > ceph-cluster-deploy
 #! /bin/bash
 
-ceph-deploy install $nodes
-sleep 1
-
-echo "AICIIIIIIIIIIIIIIIIIIIIII Pune si TU noile binare!!!"
-read
-
 mkdir ceph-deploy
 cd ceph-deploy
 
@@ -159,3 +153,32 @@ function install_dependencies {
 		ssh $node 'nohup ./install_deps.sh < /dev/null &'
 	done
 }
+
+
+function install_ceph_on_nodes {
+
+	if [[ $1 == "auto" ]]; then
+		ssh $USER@admin "ceph-deploy install $nodes"
+	elif [[ $1 == "manual" ]]; then
+		install_dependencies
+		copy_debs $2
+	fi
+}
+
+function update_ceph_binaries {
+	sources=$1
+
+	# kill all ceph-osd processes
+	sudo pkill ceph-osd
+
+	for node in $nodes; do
+		log $MODULE "Copy ceph-osd, ceph-mon on node $node..."
+		scp $sources/src/ceph-osd root@$node:/usr/bin/
+		scp $sources/src/ceph-mon root@$node:/usr/bin/
+
+
+		log $MODULE "Copy libs on node $node..."
+		scp $sources/src/.libs/libec_*.so root@$node:/usr/local/lib/ceph/erasure-code/
+	done
+}
+

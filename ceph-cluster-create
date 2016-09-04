@@ -14,7 +14,12 @@ function verify_params {
 	for option in "$@"; do
 		case "$option" in 
 		"--mode="*)
-			MODE=${option#*=};;
+			MODE=${option#*=}
+			if [[ $MODE != "auto" && $MODE != "manual" ]]; then
+				echo "Invalid option: $option"
+				exit
+			fi
+			;;
 		"--debs="*)
 			DEBS=${option#*=};;
 		*)
@@ -32,8 +37,6 @@ function verify_params {
 function create_cluster {
 
 	verify_params "$@"
-
-	exit
 
 	log $MODULE "Copy id_rsa to localhost..."
 	ssh-copy-id localhost &>> $DEBUG_FILE
@@ -118,16 +121,19 @@ function create_cluster {
 	sudo docker ps
 	log $MODULE "Create cluster nodes... Finished"
 
-	exit
-
 	log $MODULE "Generate ceph configuration file based on all the info provided in settings..."
 	generate_conf
 
 	log $MODULE "Generate deploy script to be run on admin container..."
 	generate_deploy_script
 
+	log $MODULE "Install ceph on the nodes..."
+	install_ceph_on_nodes $MODE $DEBS
+
 	log $MODULE "Copy admin script on container..."
 	scp conf ceph-cluster-deploy $USER@admin:. &>> $DEBUG_FILE
+
+	exit
 
 	log $MODULE "Deploy cluster on newly create Docker containers"
 	ssh $USER@admin "/home/$USER/ceph-cluster-deploy" &>> $DEBUG_FILE
@@ -136,5 +142,4 @@ function create_cluster {
 	stop_cluster && start_cluster
 
 	log $MODULE "Create Ceph cluster... Finished!"
-
 }

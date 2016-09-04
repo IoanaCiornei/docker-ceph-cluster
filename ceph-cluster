@@ -21,6 +21,7 @@ Usage:
 		copy-debs <folder>	- given a path where you have build the deb files install them on the nodes
 		stop-services		- stop all ceph services on cluster nodes
 		start-services		- start all ceph services on cluster nodes
+		update-ceph-binaries	- update binaries
 
 Description:
 	ceph-cluster users create a Ceph Cluster hosted entirely on a single machine.
@@ -53,6 +54,8 @@ case $1 in
 	copy_debs $2;;
 "install-deps")
 	install_dependencies;;
+"update-ceph-binaries")
+	update_ceph_binaries "${@:2}";;
 *)
 	usage;;
 esac
