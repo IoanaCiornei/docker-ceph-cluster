@@ -22,6 +22,8 @@ ROOT_PASSWORD="root"
 
 AUTHORIZED_KEYS="/home/ioana/.ssh/authorized_keys"
 
+#TODO move this into *-util
+
 # create the array of hostnames
 osds=""
 mons=""

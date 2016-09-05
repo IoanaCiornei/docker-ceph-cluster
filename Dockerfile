@@ -65,6 +65,8 @@ RUN echo -e "\n" | vim -c "PlugInstall"; echo ":q"
 RUN mkdir -p /home/pis/src/licenta/
 USER root
 
+RUN apt-get install -y udev
+
 ###### ssh + systemd  ######
 RUN ["systemctl",  "enable", "ssh.service"]
 VOLUME ["/sys/fs/cgroup"]
