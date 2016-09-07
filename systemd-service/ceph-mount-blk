@@ -2,8 +2,8 @@
 
 SERVICE_NAME=ceph-mount-service
 FILES_DIR=/home/pis/src/licenta/dev-files
-NUM_DISKS=4
-NUM_OSD=3
+NUM_DISKS=10
+NUM_OSD=1
 LOGGER="Ceph Docker Disk mounted on"
 
 
@@ -16,7 +16,11 @@ for (( i = 1; i <= $NUM_OSD; i++)); do
 		FILE="osd$i-disk$j"
 		HOST_FILE="$FILES_DIR/$FILE"
 
-		[ -f $HOST_FILE ]  || fallocate -l 2G $HOST_FILE
+		if (( j == $NUM_DISKS -1 )); then
+			[ -f $HOST_FILE ]  || fallocate -l 10G $HOST_FILE
+		else
+			[ -f $HOST_FILE ]  || fallocate -l 2G $HOST_FILE
+		fi
 		sudo losetup -f $HOST_FILE
 		disk=$(losetup --associated $HOST_FILE | cut -f1 -d:)
 		devs[$num]=$disk
@@ -30,14 +34,23 @@ done
 # partition the disks on the OSDs
 num=0
 for (( i = 1; i <= $NUM_OSD; i++)); do
-	for (( j = 0; j < 3 ; j++)); do
+	for (( j = 0; j < $NUM_DISKS - 1 ; j++)); do
 		FILE=${devs[$num]} ; ((num++))
 		echo "Running mkfs on " $FILE | systemd-cat -t $SERVICE_NAME
 		sudo parted -s $FILE mklabel gpt mkpart primary xfs 0% 100%
 		sudo mkfs.xfs $FILE -f
 	done
 	FILE=${devs[$num]} ; ((num++))
-	sudo parted -s $FILE mklabel gpt mkpart primary 0% 33% mkpart primary 34% 66% mkpart primary 67% 100%
+	sudo parted -s $FILE mklabel gpt \
+		mkpart primary 0% 11% \
+		mkpart primary 12% 22% \
+		mkpart primary 23% 33% \
+		mkpart primary 34% 44% \
+		mkpart primary 45% 55% \
+		mkpart primary 56% 66% \
+		mkpart primary 67% 77% \
+		mkpart primary 78% 88% \
+		mkpart primary 89% 100%
 done
 
 
