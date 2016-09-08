@@ -72,8 +72,19 @@ function create_cluster {
 			FILE1=${devs[$num]} ; FILE1_p1="${devs[$num]}p1"; ((num++))
 			FILE2=${devs[$num]} ; FILE2_p1="${devs[$num]}p1"; ((num++))
 			FILE3=${devs[$num]} ; FILE3_p1="${devs[$num]}p1"; ((num++))
-			FILE4=${devs[$num]} ; FILE4_p1="${devs[$num]}p1"; FILE4_p2="${devs[$num]}p2"; FILE4_p3="${devs[$num]}p3"; ((num++))
+			FILE4=${devs[$num]} ; FILE4_p1="${devs[$num]}p1"; ((num++))
+			FILE5=${devs[$num]} ; FILE5_p1="${devs[$num]}p1"; ((num++))
+			FILE6=${devs[$num]} ; FILE6_p1="${devs[$num]}p1"; ((num++))
+			FILE7=${devs[$num]} ; FILE7_p1="${devs[$num]}p1"; ((num++))
+			FILE8=${devs[$num]} ; FILE8_p1="${devs[$num]}p1"; ((num++))
+			FILE9=${devs[$num]} ; FILE9_p1="${devs[$num]}p1"; ((num++))
+			FILE10=${devs[$num]} ;
+			FILE10_p1="${devs[$num]}p1"; FILE10_p2="${devs[$num]}p2"; FILE10_p3="${devs[$num]}p3";
+			FILE10_p4="${devs[$num]}p4"; FILE10_p5="${devs[$num]}p5"; FILE10_p6="${devs[$num]}p6";
+			FILE10_p7="${devs[$num]}p7"; FILE10_p8="${devs[$num]}p8"; FILE10_p9="${devs[$num]}p9";
+			((num++))
 
+			set -x
 			# create an OSD container
 			sudo docker run -d -it \
 				--privileged \
@@ -85,10 +96,29 @@ function create_cluster {
 				-v $FILE3_p1:$FILE3_p1 \
 				-v $FILE4:$FILE4 \
 				-v $FILE4_p1:$FILE4_p1 \
-				-v $FILE4_p2:$FILE4_p2 \
-				-v $FILE4_p3:$FILE4_p3 \
+				-v $FILE5:$FILE5 \
+				-v $FILE5_p1:$FILE5_p1 \
+				-v $FILE6:$FILE6 \
+				-v $FILE6_p1:$FILE6_p1 \
+				-v $FILE7:$FILE7 \
+				-v $FILE7_p1:$FILE7_p1 \
+				-v $FILE8:$FILE8 \
+				-v $FILE8_p1:$FILE8_p1 \
+				-v $FILE9:$FILE9 \
+				-v $FILE9_p1:$FILE9_p1 \
+				-v $FILE10:$FILE10 \
+				-v $FILE10_p1:$FILE10_p1 \
+				-v $FILE10_p2:$FILE10_p2 \
+				-v $FILE10_p3:$FILE10_p3 \
+				-v $FILE10_p4:$FILE10_p4 \
+				-v $FILE10_p5:$FILE10_p5 \
+				-v $FILE10_p6:$FILE10_p6 \
+				-v $FILE10_p7:$FILE10_p7 \
+				-v $FILE10_p8:$FILE10_p8 \
+				-v $FILE10_p9:$FILE10_p9 \
 				-v /sys/fs/cgroup:/sys/fs/cgroup:ro \
 				--net ceph_network --ip $NODE_IP --hostname ${node_name[$i]} --name ${node_name[$i]} ceph_node &>> $DEBUG_FILE
+			set +x
 		else
 			# create ADMIN or MON container
 			sudo docker run -d -it \
@@ -120,6 +150,8 @@ function create_cluster {
 	log $MODULE "Cluster nodes:"
 	sudo docker ps
 	log $MODULE "Create cluster nodes... Finished"
+
+	exit
 
 	log $MODULE "Generate ceph configuration file based on all the info provided in settings..."
 	generate_conf

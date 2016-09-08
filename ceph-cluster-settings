@@ -1,10 +1,10 @@
 #! /bin/bash
 
-NUM_OSD=3
-NUM_MON=3
+NUM_OSD=1
+NUM_MON=1
 ((NUM_NODES = $NUM_MON + $NUM_OSD + 2))
 
-NUM_DISKS=4
+NUM_DISKS=10
 NUM_DEVS=$(($NUM_DISKS * $NUM_OSD))
 CURRENT_FOLDER=$(pwd)
 FILES_DIR=$(realpath ..)"/dev-files"
